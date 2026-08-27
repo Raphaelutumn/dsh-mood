@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Verify package (Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: corepack enable --install-directory .bin
+
+      # The standalone package ships built lib/ from the DeepSeek Harness
+      # monorepo (host+client bundles). We install its runtime deps, then
+      # verify the package is complete, well-formed, and packable.
+      - name: Install runtime deps
+        run: corepack pnpm install --no-frozen-lockfile --offline || echo "no offline cache — installing fresh"
+      - run: corepack pnpm install --no-frozen-lockfile
+
+      - name: Validate package.json
+        run: node -e "const p=require('./package.json'); if(!p.dsh?.bundle?.patch||!p.dsh?.client?.platform) throw new Error('dsh bundle/manifest missing'); console.log('manifest ok:', p.name, p.version)"
+
+      - name: Verify shipped lib
+        run: node -e "for (const f of ['index.js','client.js','invariant.js']) { require('node:fs').accessSync('lib/'+f); } console.log('lib ok')"
+
+      - name: Pack
+        run: corepack pnpm pack --pack-destination .out
+      - name: Upload pack artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-mood-${{ matrix.os }}-node${{ matrix.node }}
+          path: .out/*.tgz

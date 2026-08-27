@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="term" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#161c29"/>
+      <stop offset="1" stop-color="#0e1220"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="300" rx="16" fill="url(#term)"/>
+
+  <!-- window chrome -->
+  <circle cx="24" cy="26" r="7" fill="#ff5f57"/>
+  <circle cx="48" cy="26" r="7" fill="#febc2e"/>
+  <circle cx="72" cy="26" r="7" fill="#28c840"/>
+  <text x="400" y="32" text-anchor="middle" fill="#7c86a1" font-size="13" font-family="'Segoe UI', sans-serif">session — dsh-mood 状态灯</text>
+
+  <!-- header mock with the light -->
+  <g>
+    <rect x="30" y="58" width="740" height="44" rx="8" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="50" y="86" fill="#cfd7eb" font-size="14" font-weight="600">refactor build pipeline</text>
+    <!-- the status light (currently GOOD) -->
+    <rect x="600" y="64" width="154" height="32" rx="16" fill="#e8f7ee"/>
+    <text x="620" y="85" fill="#1a2133" font-size="14" font-weight="700">😊 GOOD</text>
+  </g>
+
+  <!-- the running mood turns -->
+  <g font-family="'Consolas','SF Mono',monospace" font-size="14">
+    <text x="50" y="140" fill="#eef2fb">tool  run  →  fail  ×3</text>
+    <text x="50" y="166" fill="#f7c948">      → mood: 😤 FRUSTRATED</text>
+    <text x="50" y="192" fill="#7c86a1">       why: 3 consecutive failures</text>
+    <text x="50" y="218" fill="#eef2fb">tool  lint → ok   ×2</text>
+    <text x="50" y="244" fill="#28c840">      → mood: 😊 GOOD (Recovered)</text>
+    <text x="50" y="276" fill="#7c86a1">journey: 😊 → 😤 → 😊</text>
+  </g>
+</svg>

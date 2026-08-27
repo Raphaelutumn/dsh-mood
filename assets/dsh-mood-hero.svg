@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1420"/>
+      <stop offset="1" stop-color="#1a2133"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7c5cff"/>
+      <stop offset="0.5" stop-color="#35c2ff"/>
+      <stop offset="1" stop-color="#f7c948"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="340" fill="url(#bg)"/>
+
+  <!-- subtle grid -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="85" x2="1200" y2="85"/>
+    <line x1="0" y1="170" x2="1200" y2="170"/>
+    <line x1="0" y1="255" x2="1200" y2="255"/>
+    <line x1="300" y1="0" x2="300" y2="340"/>
+    <line x1="600" y1="0" x2="600" y2="340"/>
+    <line x1="900" y1="0" x2="900" y2="340"/>
+  </g>
+
+  <!-- title -->
+  <text x="40" y="86" fill="#7c86a1" font-size="18" font-weight="600">dsh-mood</text>
+  <text x="40" y="118" fill="#eef2fb" font-size="44" font-weight="800">Your agent doesn't have feelings.</text>
+  <text x="40" y="160" fill="#aeb8d0" font-size="24">But its behavior does. It's a mood ring.</text>
+
+  <!-- four mood pills -->
+  <g font-size="22" font-weight="600">
+    <rect x="40" y="196" width="250" height="64" rx="32" fill="#e8f7ee"/>
+    <text x="70" y="238" fill="#1a2133">😊 GOOD</text>
+
+    <rect x="320" y="196" width="250" height="64" rx="32" fill="#fff6e0"/>
+    <text x="350" y="238" fill="#1a2133">😕 CONFUSED</text>
+
+    <rect x="600" y="196" width="250" height="64" rx="32" fill="#ffe9e5"/>
+    <text x="630" y="238" fill="#1a2133">😤 FRUSTRATED</text>
+
+    <rect x="880" y="196" width="250" height="64" rx="32" fill="#f7e6ff"/>
+    <text x="910" y="238" fill="#1a2133">🤯 OVERWHELMED</text>
+  </g>
+
+  <!-- journey line -->
+  <text x="40" y="304" fill="#7c86a1" font-size="18">session journey:</text>
+  <text x="240" y="304" fill="#eef2fb" font-size="22" font-weight="700">😊 → 😕 → 😤 → 😊</text>
+  <text x="620" y="304" fill="#7c86a1" font-size="18">why · 3 consecutive failures</text>
+</svg>

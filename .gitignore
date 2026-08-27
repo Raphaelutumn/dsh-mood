@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output (the shipped lib/ IS tracked — it is the installable artifact)
+*.tsbuildinfo
+
+# Local scratch
+.out/
+pack/
+*.tgz
+
+# Editor / OS
+.DS_Store
+Thumbs.db

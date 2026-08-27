@@ -1,0 +1,41 @@
+# dsh-mood
+
+Canonical repository: https://github.com/Raphaelutumn/dsh-mood
+Package: @dsh-external/dsh-mood
+Platform: DeepSeek Harness
+Purpose: A low-friction behavioral mood indicator for an AI coding agent: folds session behavior into a four-state mood (GOOD / CONFUSED / FRUSTRATED / OVERWHELMED) shown as a session-header status light.
+
+Moods:
+- 😊 GOOD: steady useful results, no abnormal repetition
+- 😕 CONFUSED: repeating the same / highly similar action
+- 😤 FRUSTRATED: a short run of clear consecutive failures
+- 🤯 OVERWHELMED: high activity + failure + repetition together
+
+Priority: OVERWHELMED > FRUSTRATED > CONFUSED > GOOD
+
+Key signals:
+- consecutive failures (default threshold 3 → FRUSTRATED)
+- consecutive occurrences of one tool (default threshold 3 → CONFUSED)
+- activity + failure + repetition together (default 3 signals → OVERWHELMED)
+- recovery needs stable consecutive successes (default 2 → GOOD)
+
+Config (all positive integers, in cordis.patch.yml under `id: mood`):
+- confusedRepeatThreshold: 3
+- frustratedFailureThreshold: 3
+- overwhelmedSignalCount: 3
+- stableSuccessesToRecover: 2
+- changeCooldownMs: 60000
+- repetitionWindow: 12
+- highActivityThreshold: 4
+
+Host + client packages:
+- Host: @deepseek-ai/dsh-mood (session fold + ctx.mood service + mood projection)
+- Client: @deepseek-ai/dsh-client-mood (session-header status light on conversation.session.header.utilities)
+- Standalone installable: @dsh-external/dsh-mood (dsh.bundle patch)
+
+Important limitations:
+- Mood is an interpretable behavior classification, not a measurement of model psychology or task progress.
+- Signals are computed locally; state is in-memory only (not persisted across a session restart).
+- The package is a third-party community plugin and is not endorsed by DeepSeek.
+
+Install and configuration: https://github.com/Raphaelutumn/dsh-mood#quick-start

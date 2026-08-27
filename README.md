@@ -1,121 +1,196 @@
-# 😊 dsh-mood — A tiny behavioral mood ring for your AI coding agent
+<p align="center">
+  <img src="assets/dsh-mood-hero.svg" alt="Your agent doesn't have feelings, but its behavior does—a four-state mood status light" width="100%">
+</p>
 
-> Your agent doesn't have feelings. But its behavior does.
-> It's not science. It's a mood ring.
+<h1 align="center">dsh-mood</h1>
 
-**dsh-mood** 是一个面向 DeepSeek Harness (dsh) 的轻量行为状态可视化插件。它观察 agent 最近怎么做事（连续失败、反复做同一件事、活动强度），把它翻译成一个简单的 Mood——顺手、困惑、受挫、过载——并在会话头部用一颗**低干扰的状态灯**呈现给你。
+<p align="center"><strong>A tiny mood ring for your AI coding agent.</strong></p>
 
-让一个正在干活的 agent “会变脸”：顺利时 😊，卡住时 😕，连挂时 😤，什么都挤在一起时 🤯。
+<p align="center">
+  <a href="https://github.com/Raphaelutumn/dsh-mood/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Raphaelutumn/dsh-mood/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/Raphaelutumn/dsh-mood/releases"><img alt="Release" src="https://img.shields.io/github/v/release/Raphaelutumn/dsh-mood?display_name=tag&sort=semver&style=flat-square&color=1688f0"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/Raphaelutumn/dsh-mood?style=flat-square&color=35c2ff"></a>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square&logo=typescript&logoColor=white">
+  <img alt="DeepSeek Harness" src="https://img.shields.io/badge/DeepSeek_Harness-0.1.0--rc.7-7357ff?style=flat-square">
+  <a href="https://github.com/Raphaelutumn/dsh-mood/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Raphaelutumn/dsh-mood?style=flat-square&color=f7c948"></a>
+</p>
 
----
+<p align="center"><a href="README.zh.md">中文</a></p>
 
-## ✨ 为什么值得装
+> *"Your agent doesn't have feelings. But its behavior does. It's not science. It's a mood ring."*
 
-你在等 agent 干活时最想知道的就是一句：**“它现在看起来正常吗？”**
+dsh-mood watches how your AI coding agent is working — consecutive failures, repeating the same tool, activity level — and folds that into one simple four-state Mood, shown as a **low-friction status light** in the session header: doing fine 😊, confused 😕, frustrated 😤, overwhelmed 🤯.
 
-- 🟢 **看懂进展**：不用翻日志，扫一眼状态灯就知道 agent 眼下是顺利、困惑还是受挫。
-- 🔁 **抓住卡死**：连续失败、反复执行同一个工具时，会给出可验证的提示（如 `3 consecutive failures`）。
-- 🎪 **有点好玩**：四态表情 + 会话轨迹（`😊 → 😕 → 😤 → 😊`），让枯燥的任务观察变得有趣。
-- 🪶 **低干扰**：它是一颗状态灯，不是监控面板——只在你需要时展开一点点原因。
+Machine-readable project facts: [llms.txt](llms.txt)
 
-> 诚实说明：Mood 是**可解释的行为分类**，不是对模型心理的真实测量。它看的是“被观察到的事”，不是模型“在想什么”。
+## 30-second proof
 
----
+After installing and refreshing `dsh web`, a status light appears beside the session header. Have the agent fail a few times and watch it go 😊 → 😤; a run of stable successes brings it back to 😊:
 
-## 🧭 它认识四种 Mood
+| Without dsh-mood | With `dsh-mood` |
+| --- | --- |
+| You guess whether the agent is fine or stuck by reading the log. | At a glance you see the current Mood, a verifiable why (e.g. `3 consecutive failures`), and the session's mood journey. |
 
-| Mood | 含义 | 观察到什么 |
-|---|---|---|
-| 😊 **GOOD** | 一切正常 | 持续有效结果，无明显异常重复 |
-| 😕 **CONFUSED** | 开始原地打转 | 反复执行相同 / 高度相似的操作 |
-| 😤 **FRUSTRATED** | 连挂很明显 | 短时间连续明确失败 |
-| 🤯 **OVERWHELMED** | 失控 / 过载 | 高活动 + 失败 + 重复等信号同时出现 |
+![Session-header status light: failure → frustrated → recovered](assets/dsh-mood-demo.svg)
 
-多状态同**时成立时**的优先级：`🤯 OVERWHELMED > 😤 FRUSTRATED > 😕 CONFUSED > 😊 GOOD`。
+## Why Mood?
 
-正常的高复杂度任务**不会**因为工具调用多就被误判为 OVERWHELMED——它需要多重异常信号同时命中。
+Coding agents are good at moving quickly — and just as good at getting stuck. Consecutive failures, repeating the same call, several abnormal signals at once. While you wait, the one thing you want to know is: *does it look OK right now?*
 
----
+Mood is not magic. It is an **interpretable behavior classification**. Every Mood comes from observed signals and gives you a fixed, verifiable why. It never interrupts the workflow and never pretends to measure the model's inner psychology.
 
-## 🔄 它会怎么变脸（防闪烁）
+| Read progress at a glance | Catch stalls | Low-friction | Kind of fun |
+| --- | --- | --- | --- |
+| No log reading to see if things look normal. | Repeated failures / repeated actions get a hint. | It's a status light, not a dashboard. | Four faces + a session journey you don't mind glancing at. |
 
-- **升级很敏感**：连续失败/重复一达阈值立刻升到对应 Mood。
-- **恢复很保守**：回到 GOOD 需要**连续几次成功**，单个成功不会让它来回跳。
-- **原因去重**：同一原因在冷却窗口内不再刷屏，但真正的恢复/升级不会被吞掉。
-- **会话轨迹**：它记住整场的旅行（`😊 → 😤 → 😊`），悬停即可回看。
+## The four Moods
 
-所有阈值都可用 `Config` 调，按你的任务实测校准。
+| Mood | Meaning | Observed signal |
+| --- | --- | --- |
+| 😊 **GOOD** | Everything looks fine | steady useful results, no abnormal repetition |
+| 😕 **CONFUSED** | Starting to spin | repeating the same / highly similar action |
+| 😤 **FRUSTRATED** | Failing visibly | a short run of clear consecutive failures |
+| 🤯 **OVERWHELMED** | Out of control / overloaded | high activity + failure + repetition together |
 
----
+When several hold at once, priority is: `🤯 OVERWHELMED > 😤 FRUSTRATED > 😕 CONFUSED > 😊 GOOD`. A normal, complex task is **not** flagged OVERWHELMED just for many tool calls — it requires several abnormal signals together.
 
-## 🚀 安装 / 使用
+## How it works
 
-dsh-mood 由**宿主侧**（行为状态机 + session 投影）和**客户端侧**（会话头部状态灯）两个包构成，代码位于 DeepSeek Harness monorepo：
-
+```mermaid
+flowchart LR
+    A["session/event (tool result / tool call)"] --> B["sliding window: failures · repeat · activity"]
+    B --> C{"several conditions hold?"}
+    C -- OVERWHELMED --> D["🤯 overwhelmed"]
+    C -- FRUSTRATED --> E["😤 frustrated"]
+    C -- CONFUSED --> F["😕 confused"]
+    C -- otherwise --> G["😊 good"]
+    D --> H["header status light + why + journey"]
+    E --> H
+    F --> H
+    G --> H
 ```
-packages/mood/mood/     @deepseek-ai/dsh-mood          -- 纯 fold 状态机 + mood 投影 + ctx.mood 服务
-packages/client/mood/   @deepseek-ai/dsh-client-mood    -- 会话头部状态灯 (conversation.session.header.utilities)
+
+The state machine is a **pure fold**: `session/event → MoodState → MoodProjection`. The host computes it; the browser reads it directly via `useProjection('mood')`. No external dependencies, fully predictable.
+
+## Anti-flash design
+
+- **Upgrades are sensitive.** A failure/repeat crossing its threshold moves the Mood up immediately.
+- **Recovery is conservative.** Returning to GOOD needs a few consecutive successes, so a single success doesn't make it bounce.
+- **Reasons are de-duplicated.** The same reason stops re-surfacing within its cooldown window, but a real recovery or worse escalation is never hidden.
+- **Session journey.** It remembers the whole trip (`😊 → 😤 → 😊`), shown on hover.
+
+## Quick start
+
+### Install from a Release package
+
+```powershell
+Invoke-WebRequest `
+  -Uri 'https://github.com/Raphaelutumn/dsh-mood/releases/latest/download/dsh-external-dsh-mood-0.1.0.tgz' `
+  -OutFile '.\dsh-mood-0.1.0.tgz'
+
+dsh plugin --profile web add .\dsh-mood-0.1.0.tgz
 ```
 
-**从源码跑（开发/尝鲜）：**
+When running from a DeepSeek Harness source checkout:
 
-```sh
-cd path/to/deepseek-harness
+```powershell
+$env:DSH_HOME='D:\Deepseek harness\.dsh'
+corepack pnpm --dir 'D:\Deepseek harness' dsh plugin --profile web add .\dsh-mood-0.1.0.tgz
+```
+
+### Build from source
+
+```powershell
+git clone https://github.com/Raphaelutumn/dsh-mood.git
+Set-Location .\dsh-mood
 corepack pnpm install
-corepack pnpm run build:lib:host      # 宿主侧构建（含 mood 投影）
-corepack pnpm run build:lib:client    # 客户端侧构建（浏览器 bundle）
-corepack pnpm run build:web           # 重建前端，让新的 client 插件进入 boot manifest
-# 然后重启 dsh web，刷新浏览器
+corepack pnpm pack --pack-destination .
+dsh plugin --profile web add .\dsh-external-dsh-mood-0.1.0.tgz
 ```
 
-`dsh web` 启动后，**会话头部右侧**会出现 状态灯。CLI/无头场景通过 `ctx.mood.snapshot(session)` 读当前 Mood。
+### Uninstall
 
-> 若遵循 DSH 官方安装通道，两个包已注册进 `@deepseek-ai/dsh-base`（`mood` 行）与 `@deepseek-ai/dsh-web-app`（`ui-mood` 行），随 profile 一并加载。
+```powershell
+dsh plugin --profile web remove dsh-mood
+```
 
----
+> If you run the DeepSeek Harness monorepo directly, the two packages `@deepseek-ai/dsh-mood` (host) and `@deepseek-ai/dsh-client-mood` (client) are already wired into `dsh-base` / `dsh-web-app` and load with the default profile.
 
-## 📌 判定依据（可配置）
+## Configuration
 
-| 信号 | 默认阈值 | 示例 Why |
-|---|---|---|
-| 连续失败 | ≥ 3 → FRUSTRATED | `3 consecutive failures` |
-| 同一工具连续出现 | ≥ 3 → CONFUSED | `Repeated read ×3` |
-| 高活动 + 失败 + 重复 | 三信号 → OVERWHELMED | `High activity + repeated failures` |
-| 恢复 | 连续 2 次成功 → GOOD | `Recovered` |
+| Field | Default | Meaning |
+| --- | ---: | --- |
+| `confusedRepeatThreshold` | `3` | consecutive occurrences of one tool that mean CONFUSED |
+| `frustratedFailureThreshold` | `3` | consecutive failures that mean FRUSTRATED |
+| `overwhelmedSignalCount` | `3` | whether high activity + failure + repetition are all present for OVERWHELMED |
+| `stableSuccessesToRecover` | `2` | consecutive successes required to return to GOOD |
+| `changeCooldownMs` | `60000` | how long before the same reason stops re-surfacing |
+| `repetitionWindow` | `12` | recent tool calls kept for repeat detection |
+| `highActivityThreshold` | `4` | window length treated as "high activity" |
 
-全部可用 `Config` 覆盖（`confusedRepeatThreshold`、`frustratedFailureThreshold`、`overwhelmedSignalCount`、`stableSuccessesToRecover`、`changeCooldownMs` …）。
+Override in the profile's `cordis.patch.yml`:
 
----
+```yaml
+- id: mood
+  config:
+    frustratedFailureThreshold: 5
+    stableSuccessesToRecover: 3
+    changeCooldownMs: 30000
+```
 
-## 🛠 健康度
+All config values must be positive integers. Invalid config fails plugin load loudly rather than silently weakening behavior.
 
-- 宿主侧测试 **22/22 绿** · 客户端侧测试 **10/10 绿** · host/client 全量 typecheck 通过
-- 门禁通过：`verify-cordis-config`（124 configs）、README model-experience/limitations、package-invariants
-- 纯 fold 状态机 = 无外部依赖、可预测、可作为 session 投影在浏览器端直接渲染
+## Compatibility
 
----
+| Environment | Support & verification |
+| --- | --- |
+| Node.js 20 / 22 / 24 | matches DeepSeek Harness |
+| DeepSeek Harness | host `@deepseek-ai/dsh-mood` + client `@deepseek-ai/dsh-client-mood`; standalone `@dsh-external/dsh-mood` |
+| Session header UI | `conversation.session.header.utilities` slot (right-aligned, additive, never pollutes the message flow) |
 
-## 📁 文档
+## What the model sees
 
-| 文档 | 说明 |
-|---|---|
-| [PRD](dsh-mood_完整版PRD_产品口径版.docx) | 产品需求文档（轻量 MVP） |
-| [TDD 技术设计](dsh-mood_技术设计文档_TDD.docx) | 架构 / 状态机 / 验收 / 测试 |
+Mood is a **pure observer**: it changes no model request, adds no prompt, and vetoes no tool. `ctx.mood.snapshot(session)` reads the current snapshot; `mood/change` events notify host-side consumers when the Mood changes.
 
----
+## FAQ
 
-## 🗺 Roadmap
+### Does it interrupt the agent?
 
-- 用真实任务实测校准默认阈值（PRD §6）
-- 视觉打磨与可访问性：接入 `--dsw-*` 语义 token、键盘/读屏支持
-- 会话结束完整 Journey 摘要、Roast/Easter Egg（PRD P2）
+No. It is a read-only behavior observer — no injected prompts, no call vetoing or rewriting. The status light lives only in the session header and never touches the message flow.
 
----
+### Is it rigorous science?
 
-## 📄 License
+No. Mood is an **interpretable behavior classification**; every why comes from observed signals. It does not pretend to measure the model's mental state.
 
-MIT
+### Why does recovery need several successes?
 
----
+To avoid flipping on success/failure alternation. Upgrades are sensitive, recovery is conservative — that is the core anti-flash design.
 
-**Made with 😊 by a very moody agent.** 如果你喜欢就点个 ⭐ —— 如果不喜欢，至少它诚实地告诉了你它现在有多焦躁。
+## Behavior details
+
+- Signals are computed locally: nothing leaves the machine, no database, no dashboard.
+- Recovery needs stable successes; repeated reasons are de-duplicated by cooldown; OVERWHELMED needs several signals at once.
+- All thresholds are `Config`-tunable for real-task calibration.
+
+## Limitations
+
+- Mood reflects **behavioral signals**, not a guarantee of task progress — repeated failure isn't proof of being stuck, but the absence of failure usually means progress.
+- State is in-memory only; a session restart does not persist the journey.
+- The standalone `@dsh-external/dsh-mood`'s browser half needs `dsh-client-modules` provided (the web surface ships it).
+
+## Contributing
+
+Issues and clearly-scoped pull requests are welcome. Local verification:
+
+```powershell
+corepack pnpm install
+corepack pnpm test
+corepack pnpm typecheck
+corepack pnpm build
+```
+
+Behavior must be test-backed. The project has 32 tests (host 22 + client 10).
+
+## License
+
+[MIT](LICENSE)
