@@ -20,23 +20,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-      - run: corepack enable --install-directory .bin
 
-      # The standalone package ships built lib/ from the DeepSeek Harness
-      # monorepo (host+client bundles). We install its runtime deps, then
-      # verify the package is complete, well-formed, and packable.
-      - name: Install runtime deps
-        run: corepack pnpm install --no-frozen-lockfile --offline || echo "no offline cache — installing fresh"
-      - run: corepack pnpm install --no-frozen-lockfile
-
+      # The standalone package ships prebuilt lib/ (built from the DeepSeek
+      # Harness monorepo). CI verifies the package is complete and well-formed
+      # without installing runtime deps.
       - name: Validate package.json
         run: node -e "const p=require('./package.json'); if(!p.dsh?.bundle?.patch||!p.dsh?.client?.platform) throw new Error('dsh bundle/manifest missing'); console.log('manifest ok:', p.name, p.version)"
 
       - name: Verify shipped lib
-        run: node -e "for (const f of ['index.js','client.js','invariant.js']) { require('node:fs').accessSync('lib/'+f); } console.log('lib ok')"
+        run: node -e "for (const f of ['index.js','client.js','invariant.js']) require('node:fs').accessSync('lib/'+f); console.log('lib ok')"
+
+      - name: Validate cordis.patch.yml
+        run: node -e "const fs=require('node:fs'); const s=fs.readFileSync('cordis.patch.yml','utf8'); if(!/id: mood/.test(s)||!/id: ui-mood/.test(s)) throw new Error('patch rows missing'); console.log('patch ok')"
 
       - name: Pack
-        run: corepack pnpm pack --pack-destination .out
+        run: npm pack --pack-destination .out
       - name: Upload pack artifact
         uses: actions/upload-artifact@v4
         with:
