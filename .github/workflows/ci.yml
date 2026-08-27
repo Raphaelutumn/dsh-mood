@@ -22,16 +22,20 @@ jobs:
           node-version: ${{ matrix.node }}
 
       # The standalone package ships prebuilt lib/ (built from the DeepSeek
-      # Harness monorepo). CI verifies the package is complete and well-formed
-      # without installing runtime deps.
+      # Harness monorepo). CI validates the package and packs it, with no
+      # runtime dependency install. Commands use YAML block scalars so colons
+      # inside the checked strings are never parsed as mapping keys.
       - name: Validate package.json
-        run: node -e "const p=require('./package.json'); if(!p.dsh?.bundle?.patch||!p.dsh?.client?.platform) throw new Error('dsh bundle/manifest missing'); console.log('manifest ok:', p.name, p.version)"
+        run: >-
+          node -e "const p=require('./package.json'); if(!p.dsh?.bundle?.patch||!p.dsh?.client?.platform) throw new Error('dsh bundle/client manifest missing'); console.log('manifest ok:', p.name, p.version)"
 
       - name: Verify shipped lib
-        run: node -e "for (const f of ['index.js','client.js','invariant.js']) require('node:fs').accessSync('lib/'+f); console.log('lib ok')"
+        run: >-
+          node -e "for (const f of ['index.js','client.js','invariant.js']) require('node:fs').accessSync('lib/'+f); console.log('lib ok')"
 
       - name: Validate cordis.patch.yml
-        run: node -e "const fs=require('node:fs'); const s=fs.readFileSync('cordis.patch.yml','utf8'); if(!/id: mood/.test(s)||!/id: ui-mood/.test(s)) throw new Error('patch rows missing'); console.log('patch ok')"
+        run: >-
+          node -e "const fs=require('node:fs'), s=fs.readFileSync('cordis.patch.yml','utf8'); if(!/id: mood/.test(s)||!/id: ui-mood/.test(s)) throw new Error('patch rows missing'); console.log('patch ok')"
 
       - name: Pack
         run: npm pack --pack-destination .out
