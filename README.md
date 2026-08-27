@@ -176,7 +176,7 @@ To avoid flipping on success/failure alternation. Upgrades are sensitive, recove
 
 - Mood reflects **behavioral signals**, not a guarantee of task progress — repeated failure isn't proof of being stuck, but the absence of failure usually means progress.
 - State is in-memory only; a session restart does not persist the journey.
-- The standalone `@dsh-external/dsh-mood`'s browser half needs `dsh-client-modules` provided (the web surface ships it).
+- **Standalone-install status.** The `@dsh-external/dsh-mood` package here builds and serves against the current DeepSeek Harness source. The DSH packages published to npm are still at `0.0.1-rc.1` and do not yet expose the web-client APIs (`conversation.session.header.utilities`, `useProjection`) this plugin uses — so a standalone `dsh plugin add` of the browser half is not yet supported against the public npm stack. It runs inside the DeepSeek Harness monorepo and with the default web profile. We will publish standalone once the public client stack catches up. See `packages/dsh-mood/README.md`.
 
 ## Contributing
 

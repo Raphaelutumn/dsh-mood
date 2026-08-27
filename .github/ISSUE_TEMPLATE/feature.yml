@@ -1,0 +1,24 @@
+name: Feature / threshold suggestion
+description: Suggest a new signal, a Mood, or a configurable threshold calibration.
+labels: [enhancement]
+assignees: []
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would this help with?
+      description: The behavior scenario you want dsh-mood to notice or stop misjudging.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: e.g. a new observable signal, a new config field (with default), or a default threshold tuning.
+    validations:
+      required: true
+  - type: textarea
+    id: calibration
+    attributes:
+      label: Real-task calibration data (optional, very useful)
+      description: Real session examples where the current default produced a wrong Mood — helps tune `Config` defaults.

@@ -1,0 +1,54 @@
+.light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: default;
+  position: relative;
+  color: var(--dsw-text-2, inherit);
+}
+
+.light[data-mood='good'] { background: var(--dsw-bg-mood-good, #e8f7ee); }
+.light[data-mood='confused'] { background: var(--dsw-bg-mood-confused, #fff6e0); }
+.light[data-mood='frustrated'] { background: var(--dsw-bg-mood-frustrated, #ffe9e5); }
+.light[data-mood='overwhelmed'] { background: var(--dsw-bg-mood-overwhelmed, #f7e6ff); }
+
+.emoji {
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+.label {
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.journey {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.375rem);
+  right: 0;
+  z-index: 10;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--dsw-surface-1, #fff);
+  box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.12);
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+.light:hover .journey {
+  display: flex;
+}
+
+.journeyTitle {
+  font-weight: 600;
+}
+
+.journeyText {
+  color: var(--dsw-text-2, inherit);
+}

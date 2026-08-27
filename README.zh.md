@@ -176,7 +176,7 @@ Mood 是**纯观察者**：它不修改任何模型请求、不加 prompt、不�
 
 - Mood 反映的是**行为信号**，不是任务进度的保证——持续失败未必等于卡死，但没有失败通常说明在推进。
 - 当前是运行时内存状态，会话重启不持久化。
-- 独立包 `@dsh-external/dsh-mood` 的浏览器端需要 `dsh-client-modules` 提供（web surface 自带）。
+- **独立安装状态**：这里的 `@dsh-external/dsh-mood` 包基于当前 DeepSeek Harness 源码构建并运行。但发布到 npm 的 DSH 包仍停留在 `0.0.1-rc.1`，尚未包含本插件依赖的 Web 端 API（`conversation.session.header.utilities`、`useProjection`）——因此在公开 npm 栈上，浏览器端的独立 `dsh plugin add` 安装暂不可行。它在 DeepSeek Harness monorepo 内运行、随默认 web profile 载入。待公开客户端栈追上后会再发布独立包。参见 `packages/dsh-mood/README.md`。
 
 ## 参与贡献
 
