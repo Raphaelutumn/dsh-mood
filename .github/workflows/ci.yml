@@ -37,6 +37,8 @@ jobs:
         run: >-
           node -e "const fs=require('node:fs'), s=fs.readFileSync('cordis.patch.yml','utf8'); if(!/id: mood/.test(s)||!/id: ui-mood/.test(s)) throw new Error('patch rows missing'); console.log('patch ok')"
 
+      - name: Ensure output dir
+        run: node -e "require('node:fs').mkdirSync('.out', { recursive: true })"
       - name: Pack
         run: npm pack --pack-destination .out
       - name: Upload pack artifact
