@@ -1,0 +1,20 @@
+# dsh-mood bundle patch: installs the behavioral mood indicator (host state
+# machine + session projection) and the session-header status light (client).
+
+- insert:
+    # Host: folds session events into a four-state mood + exposes ctx.mood.
+    - id: mood
+      name: '@dsh-external/dsh-mood'
+      config:
+        confusedRepeatThreshold: 3
+        frustratedFailureThreshold: 3
+        overwhelmedSignalCount: 3
+        changeCooldownMs: 60000
+        stableSuccessesToRecover: 2
+        journeyMaxLength: 8
+        repetitionWindow: 12
+        highActivityThreshold: 4
+
+    # Client: session-header mood status light (browser half).
+    - id: ui-mood
+      name: '@dsh-external/dsh-mood/client'
